@@ -1,0 +1,17 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+*.egg-info
+node_modules
+frontend/node_modules
+frontend/dist
+.vercel
+frontend/.vercel
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+.env
+deployment-output.txt
