@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  action     String
+  actorId    String?
+  actorType  AuditActorType @default(SYSTEM)
+  subjectId  String?
+  subjectType String?
+  status     AuditStatus @default(SUCCESS)
+  requestId  String?
+  sourceIp   String?
+  userAgent  String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([action, createdAt])
+  @@index([actorId, createdAt])
+  @@index([status, createdAt])
+  @@map("audit_events")
+}
+
+enum AuditStatus {
+  SUCCESS
+  FAILURE
+  PENDING
+}
+
+enum AuditActorType {
+  USER
+  SYSTEM
+  SERVICE
+}
