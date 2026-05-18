@@ -2,14 +2,9 @@ const footerColumns = [
   {
     title: "Platform",
     links: [
-      { label: "Enterprise shell", href: "/" },
+      { label: "Live detection", href: "/#detection-console" },
+      { label: "Secure workspace", href: "/workspace" },
       { label: "Legal & compliance", href: "/legal" },
-      {
-        label: "Current production frontend",
-        href:
-          process.env.NEXT_PUBLIC_VITE_FRONTEND_URL
-          || "https://frontend-buttertech-team.vercel.app",
-      },
     ],
   },
   {
@@ -23,18 +18,8 @@ const footerColumns = [
   {
     title: "Operations",
     links: [
-      {
-        label: "GitHub repository",
-        href:
-          process.env.NEXT_PUBLIC_GITHUB_REPO
-          || "https://github.com/franzheffa/smith-heffa-deepfakedetection",
-      },
-      {
-        label: "Monitoring dashboard",
-        href:
-          process.env.NEXT_PUBLIC_DASHBOARD_URL
-          || "https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=DeepFake-Monitoring-Dashboard",
-      },
+      { label: "Google sign-in", href: "/sign-in" },
+      { label: "Payment routing", href: "/workspace" },
       { label: "Audit API", href: "/api/audit" },
     ],
   },
@@ -53,8 +38,9 @@ export function SiteFooter() {
               Enterprise trust infrastructure for AI-native media verification.
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/72">
-              Smith-Heffa Deepfake Detection is being hardened for production rollout across
-              marketplace, partner and enterprise channels with a stable migration path.
+              Smith-Heffa Deepfake Detection is now positioned as the public trust layer for
+              image verification, operator review, usage-based monetization, and Buttertech
+              enterprise rollout.
             </p>
           </div>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signIn } from "@/auth";
+import { GoogleMark } from "@/components/google-mark";
 
 export default function SignInPage() {
   return (
@@ -24,8 +25,9 @@ export default function SignInPage() {
         >
           <button
             type="submit"
-            className="inline-flex min-h-12 items-center justify-center rounded-full bg-[var(--foreground)] px-6 text-sm font-semibold text-white transition hover:bg-[var(--foreground-soft)]"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[var(--foreground)] px-6 text-sm font-semibold text-white transition hover:bg-[var(--foreground-soft)]"
           >
+            <GoogleMark />
             Continue with Google
           </button>
         </form>

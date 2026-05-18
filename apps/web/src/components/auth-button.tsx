@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, signOut } from "next-auth/react";
+import { GoogleMark } from "@/components/google-mark";
 
 type AuthButtonProps = {
   signedIn: boolean;
@@ -23,8 +24,9 @@ export function AuthButton({ signedIn }: AuthButtonProps) {
     <button
       type="button"
       onClick={() => signIn("google", { callbackUrl: "/workspace" })}
-      className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-[#111111] transition hover:translate-y-[-1px]"
+      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#111111] transition hover:translate-y-[-1px]"
     >
+      <GoogleMark />
       Continue with Google
     </button>
   );

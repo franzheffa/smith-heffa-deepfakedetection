@@ -3,6 +3,10 @@ import Google from "next-auth/providers/google";
 import { getPrismaClient } from "@/lib/prisma";
 import { recordAuditEvent } from "@/lib/audit";
 
+function normalizeEnvValue(value?: string) {
+  return value?.replace(/^"+|"+$/g, "").replace(/\\n/g, "").trim();
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   session: {
@@ -10,8 +14,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: normalizeEnvValue(process.env.GOOGLE_CLIENT_ID),
+      clientSecret: normalizeEnvValue(process.env.GOOGLE_CLIENT_SECRET),
     }),
   ],
   callbacks: {
