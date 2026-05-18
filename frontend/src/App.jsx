@@ -3,6 +3,9 @@ import axios from 'axios'
 import { FiShield, FiCheck, FiX, FiLoader, FiFolder, FiEye, FiBarChart2, FiGithub, FiExternalLink } from 'react-icons/fi'
 import './App.css'
 
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT?.replace(/\/$/, '')
+const DEFAULT_GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'https://github.com/franzheffa/smith-heffa-deepfakedetection'
+
 function App() {
   const [image, setImage] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -14,47 +17,45 @@ function App() {
   useEffect(() => {
     // Fetch dashboard and GitHub repo URLs
     const fetchLinks = async () => {
+      if (!API_ENDPOINT) {
+        setGithubRepo(DEFAULT_GITHUB_REPO)
+        return
+      }
+
       try {
-        const apiEndpoint = import.meta.env.VITE_API_ENDPOINT
-        if (apiEndpoint) {
-          const response = await axios.get(`${apiEndpoint}/dashboard`)
-          if (response.data) {
-            // Handle both string and object responses
-            let data = response.data
-            if (typeof data === 'string') {
-              try {
-                data = JSON.parse(data)
-              } catch (e) {
-                // If parsing fails, log error and try to continue with original data
-                console.warn('Failed to parse response data as JSON:', e)
-                // If it's already a string, try to check if it might be a wrapped response
-                // Otherwise, set data to null to avoid further errors
-                data = null
-              }
-            }
-            // Handle nested body structure from API Gateway
-            if (data && data.body) {
-              if (typeof data.body === 'string') {
-                try {
-                  data = JSON.parse(data.body)
-                } catch (e) {
-                  console.warn('Failed to parse body as JSON:', e)
-                  data = null
-                }
-              } else {
-                data = data.body
-              }
-            }
-            if (data && data.dashboard_url && data.github_repo) {
-              setDashboardUrl(data.dashboard_url)
-              setGithubRepo(data.github_repo)
+        const response = await axios.get(`${API_ENDPOINT}/dashboard`)
+        if (response.data) {
+          // Handle both string and object responses
+          let data = response.data
+          if (typeof data === 'string') {
+            try {
+              data = JSON.parse(data)
+            } catch (e) {
+              console.warn('Failed to parse response data as JSON:', e)
+              data = null
             }
           }
+          // Handle nested body structure from API Gateway
+          if (data && data.body) {
+            if (typeof data.body === 'string') {
+              try {
+                data = JSON.parse(data.body)
+              } catch (e) {
+                console.warn('Failed to parse body as JSON:', e)
+                data = null
+              }
+            } else {
+              data = data.body
+            }
+          }
+          if (data?.dashboard_url) {
+            setDashboardUrl(data.dashboard_url)
+          }
+          setGithubRepo(data?.github_repo || DEFAULT_GITHUB_REPO)
         }
       } catch (error) {
         console.error('Failed to fetch dashboard info:', error)
-        // Set default GitHub repo if API fails
-        setGithubRepo('https://github.com/franzheffa/smith-heffa-deepfakedetection')
+        setGithubRepo(DEFAULT_GITHUB_REPO)
       }
     }
     fetchLinks()
@@ -73,13 +74,18 @@ function App() {
 
   const uploadImage = async () => {
     if (!image) return
+
+    if (!API_ENDPOINT) {
+      setError('API endpoint not configured. Set VITE_API_ENDPOINT before production use.')
+      return
+    }
     
     setLoading(true)
     setError(null)
     
     try {
       const base64 = image.split(',')[1]
-      const response = await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/upload`, {
+      const response = await axios.post(`${API_ENDPOINT}/upload`, {
         image: base64
       })
       
@@ -94,6 +100,21 @@ function App() {
 
   return (
     <div className="app">
+      <div className="brand-shell">
+        <div className="brand-accent brand-accent-left" aria-hidden="true" />
+        <div className="brand-accent brand-accent-right" aria-hidden="true" />
+
+        <div className="brand-hero">
+          <div className="brand-kicker">Buttertech AI Ecosystem</div>
+          <div className="brand-title-row">
+            <FiShield className="brand-mark" />
+            <div>
+              <h1>Smith-Heffa Deepfake Detection</h1>
+              <p>Enterprise-grade media integrity screening for go-to-market, platform trust, and compliance workflows.</p>
+            </div>
+          </div>
+        </div>
+
       {/* Banner Section */}
       <div className="banner-container">
         {dashboardUrl && (
@@ -133,7 +154,7 @@ function App() {
       <div className="header">
         <FiShield className="header-icon" />
         <h1>Deepfake Detection</h1>
-        <p>Advanced deepfake detection powered by AI</p>
+        <p>Advanced deepfake detection powered by NVIDIA AI and cloud-native infrastructure</p>
       </div>
       
       <div className="upload-section">
@@ -226,15 +247,43 @@ function App() {
       )}
       
       <footer style={{ 
-        textAlign: 'center', 
-        marginTop: '2rem', 
-        padding: '1rem', 
-        fontSize: '0.8rem', 
-        opacity: '0.7',
-        color: 'white'
+        marginTop: '2rem'
       }}>
-        Built by Louis Echefu
+        <div className="enterprise-footer">
+          <div className="footer-top">
+            <div>
+              <div className="footer-brand">Buttertech</div>
+              <p className="footer-copy">
+                Enterprise AI platforms for trust, payments, cloud distribution, and intelligent workflow automation.
+              </p>
+            </div>
+            <div className="footer-grid">
+              <div>
+                <h4>Platform</h4>
+                <a href={DEFAULT_GITHUB_REPO} target="_blank" rel="noopener noreferrer">Source Repository</a>
+                {dashboardUrl && <a href={dashboardUrl} target="_blank" rel="noopener noreferrer">Monitoring Dashboard</a>}
+              </div>
+              <div>
+                <h4>Ecosystem</h4>
+                <span>Vercel</span>
+                <span>Google Cloud</span>
+                <span>NVIDIA AI Enterprise</span>
+              </div>
+              <div>
+                <h4>Operations</h4>
+                <span>Production-ready deployment</span>
+                <span>Observability enabled</span>
+                <span>Enterprise security baseline</span>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>© 2026 Buttertech. Smith-Heffa platform.</span>
+            <span>Brand system: Pure White / Black / Sun Gold.</span>
+          </div>
+        </div>
       </footer>
+      </div>
     </div>
   )
 }
