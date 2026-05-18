@@ -7,24 +7,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AuditEvent {
+model User {
+  id                String            @id @default(cuid())
+  email             String?           @unique
+  name              String?
+  image             String?
+  role              UserRole          @default(CUSTOMER)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  detections        DetectionJob[]
+  checkoutSessions  CheckoutSession[]
+  conversations     AgentConversation[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model DetectionJob {
+  id           String          @id @default(cuid())
+  userId       String?
+  assetType    DetectionAssetType
+  status       DetectionStatus @default(PENDING)
+  sourceName   String?
+  provider     String?
+  requestBody  Json?
+  responseBody Json?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("detection_jobs")
+}
+
+model CheckoutSession {
+  id           String                @id @default(cuid())
+  userId       String?
+  planCode     String
+  amountCents  Int?
+  currency     String                @default("USD")
+  provider     PaymentProvider       @default(PAYGATE)
+  status       CheckoutSessionStatus @default(PENDING)
+  checkoutUrl  String
+  metadata     Json?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  user         User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("checkout_sessions")
+}
+
+model AgentConversation {
   id         String   @id @default(cuid())
-  action     String
-  actorId    String?
-  actorType  AuditActorType @default(SYSTEM)
-  subjectId  String?
-  subjectType String?
-  status     AuditStatus @default(SUCCESS)
-  requestId  String?
-  sourceIp   String?
-  userAgent  String?
-  details    Json?
+  userId     String?
+  provider   String
+  title      String?
+  lastPrompt String?
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, updatedAt])
+  @@map("agent_conversations")
+}
+
+model AuditEvent {
+  id          String         @id @default(cuid())
+  action      String
+  actorId     String?
+  actorType   AuditActorType @default(SYSTEM)
+  subjectId   String?
+  subjectType String?
+  status      AuditStatus    @default(SUCCESS)
+  requestId   String?
+  sourceIp    String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime       @default(now())
 
   @@index([action, createdAt])
   @@index([actorId, createdAt])
   @@index([status, createdAt])
   @@map("audit_events")
+}
+
+enum UserRole {
+  CUSTOMER
+  ANALYST
+  ADMIN
+}
+
+enum DetectionAssetType {
+  IMAGE
+  VIDEO
+}
+
+enum DetectionStatus {
+  PENDING
+  SUCCESS
+  FAILURE
+}
+
+enum PaymentProvider {
+  PAYGATE
+  STRIPE
+}
+
+enum CheckoutSessionStatus {
+  PENDING
+  REDIRECTED
+  COMPLETED
+  FAILED
 }
 
 enum AuditStatus {
